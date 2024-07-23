@@ -23,4 +23,5 @@ func main() {
 	if err := kabarinRunner.Notify(); err != nil {
 		panic(err)
 	}
+
 }

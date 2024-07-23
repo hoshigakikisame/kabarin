@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"errors"
+	"fmt"
 	"os"
 )
 
@@ -27,4 +29,14 @@ func FileExists(filename string) bool {
 		return false
 	}
 	return !info.IsDir()
+}
+
+func ValidateEnvVars(keys ...string) error {
+	var errStr string
+	for _, key := range keys {
+		if _, exist := os.LookupEnv(key); !exist {
+			errStr += fmt.Sprintf("ENV Var: %s is required\n", key)
+		}
+	}
+	return errors.New(errStr)
 }
