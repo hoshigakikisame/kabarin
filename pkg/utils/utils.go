@@ -84,3 +84,25 @@ func FileSplit(filePath string, chunkSize int, cb func(chunk []byte, iteration i
 
 	return nil
 }
+
+func ChunkTextStream(text string, maxChar int) []string {
+	dataQueue := []string{}
+	stream := text
+
+	var chunk string
+	finished := false
+
+	for !finished {
+		if len(stream) < maxChar {
+			chunk = stream
+			finished = true
+		} else {
+			chunk = stream[:maxChar]
+			stream = stream[maxChar:]
+		}
+
+		dataQueue = append(dataQueue, chunk)
+	}
+
+	return dataQueue
+}

@@ -20,6 +20,7 @@ func main() {
 	*providers = append(*providers, telegramProvider)
 
 	kabarinRunner := runner.New(options, providers)
+
 	if err := kabarinRunner.Notify(); err != nil {
 		panic(err)
 	}

@@ -1,9 +1,21 @@
 package runner
 
-import "fmt"
+import (
+	"github.com/projectdiscovery/gologger"
+)
+
+const (
+	version = "1.0.0"
+	author  = "ferdirianrk"
+	banner  = `                           
+   __        __            _    
+  / /_____ _/ /  ___ _____(_)__ 
+ /  '_/ _ \/ _ \/ _ \/ __/ / _ \
+/_/\_\\_,_/_.__/\_,_/_/ /_/_//_/`
+)
 
 func showBanner() {
-	fmt.Printf(`
+	gologger.Print().Msgf(`
 %s  v%s
 
 by @%s

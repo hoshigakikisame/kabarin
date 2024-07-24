@@ -8,7 +8,8 @@ Kabarin is a notification utility that take stdin and a file as an input and sen
 ## TODO
 - [ ] Create unit test
 - [x] Add file splitter if input file size is too big
-- [ ] Add bulk message processing support
+- [x] Add bulk message processing support
+- [x] Add max character limit option for text message
 - [ ] Add request / second limit
 - [ ] Add more service (discord, slack, etc)
 - [ ] Add more configuration (e.g. retry, timeout, etc)

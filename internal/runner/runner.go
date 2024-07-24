@@ -1,7 +1,9 @@
 package runner
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -30,13 +32,56 @@ func (r *runner) runProviders(cb func(provider providers.Provider) error) error 
 
 func (r *runner) Notify() error {
 
-	if r.options.Data != "" {
-		r.runProviders(func(provider providers.Provider) error {
-			if err := provider.SendText(&r.options.Data); err != nil {
+	if utils.HasStdin() {
+
+		var dataQueue []string
+		maxChar := int(r.options.CharLimit)
+
+		if r.options.isBulk {
+			dataBytes, err := io.ReadAll(os.Stdin)
+			if err != nil {
 				return err
 			}
-			return nil
-		})
+
+			dataQueue = append(dataQueue, string(dataBytes))
+
+			for _, line := range dataQueue {
+				if maxChar != 0 {
+					dataQueue = utils.ChunkTextStream(line, maxChar)
+				}
+
+				r.runProviders(func(provider providers.Provider) error {
+					for _, data := range dataQueue {
+						if err := provider.SendText(&data); err != nil {
+							return err
+						}
+					}
+					return nil
+				})
+			}
+		} else {
+			sc := bufio.NewScanner(os.Stdin)
+
+			for sc.Scan() {
+				stream := sc.Text()
+
+				if maxChar != 0 {
+					dataQueue = utils.ChunkTextStream(stream, maxChar)
+				} else {
+					dataQueue = append(dataQueue, stream)
+				}
+
+				r.runProviders(func(provider providers.Provider) error {
+					for _, data := range dataQueue {
+						if err := provider.SendText(&data); err != nil {
+							return err
+						}
+					}
+					return nil
+				})
+
+			}
+		}
 	}
 
 	if r.options.File != "" {
@@ -58,11 +103,12 @@ func (r *runner) Notify() error {
 			utils.FileSplit(r.options.File, int(r.options.ChunkSize), func(chunk []byte, iteration int) error {
 				outFileName := fmt.Sprintf("%s_pt-%d%s", strings.TrimSuffix(filepath.Base(r.options.File), filepath.Ext(r.options.File)), iteration, filepath.Ext(r.options.File))
 
-				for _, provider := range *r.providers {
+				r.runProviders(func(provider providers.Provider) error {
 					if err := provider.SendFile(&outFileName, &chunk); err != nil {
 						return err
 					}
-				}
+					return nil
+				})
 
 				return nil
 			})
