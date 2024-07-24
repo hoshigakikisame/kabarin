@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -39,4 +40,47 @@ func ValidateEnvVars(keys ...string) error {
 		}
 	}
 	return errors.New(errStr)
+}
+
+func FileSplit(filePath string, chunkSize int, cb func(chunk []byte, iteration int) error) error {
+
+	if chunkSize == 0 {
+		chunkSize = 10 * 1024 * 1024
+	}
+
+	var (
+		i           int    = 0
+		startIndex  int    = 0
+		offsetIndex int    = chunkSize
+		lf          []byte = []byte("lf")
+		finished    bool   = false
+	)
+
+	dat, err := os.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	for i = 1; !finished; i++ {
+		var chunk []byte
+
+		if len(dat) < chunkSize {
+			chunk = dat
+			finished = true
+		} else {
+
+			if index := bytes.LastIndex(dat[startIndex:offsetIndex], lf); index != -1 {
+				offsetIndex = index
+			}
+
+			chunk = dat[startIndex:offsetIndex]
+			dat = dat[offsetIndex:]
+		}
+
+		if err := cb(chunk, i); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

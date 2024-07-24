@@ -13,6 +13,7 @@ const (
   kabarin <options>
   <input> | kabarin <options>`
 	options = `
-  -f, -file <FILE>		File to be send
-  -v, -version 			Show kabarin version`
+  -f, -file <FILE>        File to be send
+  -s, -size <CHUNK_SIZE>  Size of chunks produced by splitting input file (in MB)
+  -v, -version            Show kabarin version`
 )

@@ -1,7 +1,7 @@
 package providers
 
 type Provider interface {
-	SendText(text string) error
-	SendFile(filepath string) error
+	SendText(text *string) error
+	SendFile(fileName *string, data *[]byte) error
 	Close() error
 }

@@ -1,10 +1,9 @@
 package telegram
 
 import (
-	"bufio"
+	"bytes"
 	"context"
 	"os"
-	"path/filepath"
 	"strconv"
 
 	"github.com/hoshigakikisame/kabarin/pkg/utils"
@@ -70,41 +69,28 @@ func New() (*Telegram, error) {
 	}, nil
 }
 
-func (t *Telegram) SendText(text string) error {
+func (t *Telegram) SendText(text *string) error {
 	receiverID := os.Getenv("TELEGRAM_RECEIVER_ID")
 
-	if _, err := t.sender.Resolve(receiverID).Text(context.Background(), text); err != nil {
+	if _, err := t.sender.Resolve(receiverID).Text(context.Background(), *text); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (t *Telegram) SendFile(filePath string) error {
+func (t *Telegram) SendFile(fileName *string, data *[]byte) error {
 	receiverID := os.Getenv("TELEGRAM_RECEIVER_ID")
 
-	file, err := os.Open(filePath)
+	f, err := t.up.Upload(context.Background(), uploader.NewUpload(*fileName, bytes.NewReader(*data), int64(len(*data))))
 	if err != nil {
-		return err
-	}
-	defer func() {
-		_ = file.Close()
-	}()
-	// Get file size
-	fileInfo, err := file.Stat()
-	if err != nil {
-		return err
+		panic(err)
 	}
 
-	f, err := t.up.Upload(context.Background(), uploader.NewUpload(fileInfo.Name(), bufio.NewReader(file), fileInfo.Size()))
-	if err != nil {
-		return err
-	}
-
-	media := message.UploadedDocument(f).ForceFile(true).Filename(filepath.Base(filePath))
+	media := message.UploadedDocument(f).ForceFile(true).Filename(*fileName)
 
 	if _, err := t.sender.Resolve(receiverID).Media(context.Background(), media); err != nil {
-		return err
+		panic(err)
 	}
 
 	return nil

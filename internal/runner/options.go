@@ -11,9 +11,10 @@ import (
 )
 
 type Options struct {
-	File    string
-	Version bool
-	Data    string
+	File      string
+	ChunkSize uint
+	Version   bool
+	Data      string
 }
 
 var o *Options
@@ -24,19 +25,19 @@ func init() {
 	flag.StringVar(&o.File, "f", "", "")
 	flag.StringVar(&o.File, "file", "", "")
 
+	flag.UintVar(&o.ChunkSize, "s", 0, "")
+	flag.UintVar(&o.ChunkSize, "size", 0, "")
+
 	flag.BoolVar(&o.Version, "v", false, "")
 	flag.BoolVar(&o.Version, "version", false, "")
 
 	flag.Usage = func() {
+		showBanner()
 		help := fmt.Sprintf(`
-%s  v%s
-
-by @%s
-
 Usage: %s
 
 Options: %s
-`, banner, version, author, usage, options)
+`, usage, options)
 		fmt.Print(help)
 	}
 
@@ -50,15 +51,30 @@ func (o *Options) validate() error {
 			return err
 		}
 		o.Data = string(data)
-	} else if o.File == "" && !utils.FileExists(o.File) {
-		return errors.New("file doesn't exist")
+		return nil
 	}
+
+	if o.File != "" {
+		if !utils.FileExists(o.File) {
+			return errors.New("file doesn't exist")
+		}
+
+		if o.ChunkSize != 0 {
+			o.ChunkSize *= 1024 * 1024
+		}
+
+		return nil
+	}
+
 	return nil
 }
 
 func Parse() *Options {
+	showBanner()
+
 	if err := o.validate(); err != nil {
 		panic(err)
 	}
+
 	return o
 }
