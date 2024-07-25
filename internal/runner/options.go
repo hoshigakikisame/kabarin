@@ -13,6 +13,8 @@ type Options struct {
 	Version   bool
 	CharLimit uint
 	isBulk    bool
+	RateLimit uint
+	Delay     uint
 }
 
 var o *Options
@@ -31,6 +33,12 @@ func init() {
 
 	flag.BoolVar(&o.isBulk, "b", false, "")
 	flag.BoolVar(&o.isBulk, "bulk", false, "")
+
+	flag.UintVar(&o.RateLimit, "rl", 1, "")
+	flag.UintVar(&o.RateLimit, "rate-limit", 1, "")
+
+	flag.UintVar(&o.Delay, "d", 0, "")
+	flag.UintVar(&o.Delay, "delay", 0, "")
 
 	flag.BoolVar(&o.Version, "v", false, "")
 	flag.BoolVar(&o.Version, "version", false, "")

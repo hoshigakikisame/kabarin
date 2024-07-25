@@ -10,29 +10,22 @@ import (
 
 	"github.com/hoshigakikisame/kabarin/pkg/providers"
 	"github.com/hoshigakikisame/kabarin/pkg/utils"
+	"github.com/projectdiscovery/gologger"
 )
 
 type runner struct {
 	options   *Options
-	providers *[]providers.Provider
+	providers *providers.Providers
 }
 
-func New(options *Options, providers *[]providers.Provider) *runner {
+func New(options *Options, providers *providers.Providers) *runner {
 	return &runner{options: options, providers: providers}
-}
-
-func (r *runner) runProviders(cb func(provider providers.Provider) error) error {
-	for _, provider := range *r.providers {
-		if err := cb(provider); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func (r *runner) Notify() error {
 
 	if utils.HasStdin() {
+		gologger.Info().Msg("Starting message notifier")
 
 		var dataQueue []string
 		maxChar := int(r.options.CharLimit)
@@ -50,14 +43,9 @@ func (r *runner) Notify() error {
 					dataQueue = utils.ChunkTextStream(line, maxChar)
 				}
 
-				r.runProviders(func(provider providers.Provider) error {
-					for _, data := range dataQueue {
-						if err := provider.SendText(&data); err != nil {
-							return err
-						}
-					}
-					return nil
-				})
+				for _, data := range dataQueue {
+					r.providers.SendText(&data, &o.Delay)
+				}
 			}
 		} else {
 			sc := bufio.NewScanner(os.Stdin)
@@ -68,23 +56,20 @@ func (r *runner) Notify() error {
 				if maxChar != 0 {
 					dataQueue = utils.ChunkTextStream(stream, maxChar)
 				} else {
-					dataQueue = append(dataQueue, stream)
+					dataQueue = []string{stream}
 				}
 
-				r.runProviders(func(provider providers.Provider) error {
-					for _, data := range dataQueue {
-						if err := provider.SendText(&data); err != nil {
-							return err
-						}
-					}
-					return nil
-				})
+				for _, data := range dataQueue {
+					r.providers.SendText(&data, &o.Delay)
+				}
 
 			}
 		}
 	}
 
 	if r.options.File != "" {
+		gologger.Info().Msg("Starting file notifier")
+
 		var outFileName string
 
 		if r.options.ChunkSize == 0 {
@@ -94,21 +79,12 @@ func (r *runner) Notify() error {
 			}
 			outFileName = filepath.Base(r.options.File)
 
-			for _, provider := range *r.providers {
-				if err := provider.SendFile(&outFileName, &data); err != nil {
-					return err
-				}
-			}
+			r.providers.SendFile(&outFileName, &data, &o.Delay)
 		} else {
 			utils.FileSplit(r.options.File, int(r.options.ChunkSize), func(chunk []byte, iteration int) error {
 				outFileName := fmt.Sprintf("%s_pt-%d%s", strings.TrimSuffix(filepath.Base(r.options.File), filepath.Ext(r.options.File)), iteration, filepath.Ext(r.options.File))
 
-				r.runProviders(func(provider providers.Provider) error {
-					if err := provider.SendFile(&outFileName, &chunk); err != nil {
-						return err
-					}
-					return nil
-				})
+				r.providers.SendFile(&outFileName, &chunk, &o.Delay)
 
 				return nil
 			})
