@@ -44,16 +44,16 @@ Kabarin use environment variable for configuration. You can set it in your shell
 - `TELEGRAM_BOT_TOKEN`: Telegram Bot Token
 - `TELEGRAM_RECEIVER_ID`: Telegram Receiver ID (t.me/[username])
 
-## Usage
+## How to use
 ### Stream text piped input
 ```bash
-echo hackerone.com | assetfinder --subs-only | kabarin
+subfinder -d hackerone.com | kabarin
 ```
 ![alt text](assets/stream_text.png)
 
 ### Bulk text piped input
 ```bash
-echo hackerone.com | assetfinder --subs-only | kabarin -bulk
+subfinder -d hackerone.com | kabarin -bulk
 ```
 ![alt text](assets/bulk_text.png)
 
