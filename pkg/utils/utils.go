@@ -1,10 +1,11 @@
 package utils
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"os"
+
+	"github.com/projectdiscovery/gologger"
 )
 
 func HasStdin() bool {
@@ -42,67 +43,62 @@ func ValidateEnvVars(keys ...string) error {
 	return errors.New(errStr)
 }
 
-func FileSplit(filePath string, chunkSize int, cb func(chunk []byte, iteration int) error) error {
+func TextChunkStream(text string, maxChar uint) <-chan string {
+
+	textQueue := make(chan string)
+	var chunk string
+
+	go func() {
+		defer close(textQueue)
+
+		for last := false; !last; {
+			if len(text) < int(maxChar) || maxChar == 0 {
+				chunk = text
+				last = true
+			} else {
+				chunk = text[:maxChar]
+				text = text[maxChar:]
+			}
+			textQueue <- chunk
+		}
+	}()
+	return textQueue
+}
+
+func FileChunkStream(filePath string, chunkSize uint) <-chan []byte {
 
 	if chunkSize == 0 {
 		chunkSize = 10 * 1024 * 1024
 	}
 
-	var (
-		i           int    = 0
-		startIndex  int    = 0
-		offsetIndex int    = chunkSize
-		lf          []byte = []byte("lf")
-		finished    bool   = false
-	)
-
-	dat, err := os.ReadFile(filePath)
+	file, err := os.Open(filePath)
 	if err != nil {
-		return err
+		gologger.Fatal().Msgf("Error on opening file, detail: %v", err)
 	}
 
-	for i = 1; !finished; i++ {
-		var chunk []byte
+	chunkQueue := make(chan []byte)
+	chunk := make([]byte, chunkSize)
 
-		if len(dat) < chunkSize {
-			chunk = dat
-			finished = true
-		} else {
+	go func() {
+		defer close(chunkQueue)
 
-			if index := bytes.LastIndex(dat[startIndex:offsetIndex], lf); index != -1 {
-				offsetIndex = index
+		for last := false; !last; {
+
+			n, err := file.Read(chunk)
+
+			if err != nil {
+				gologger.Fatal().Msgf("Error during file read, detail: %v", err)
 			}
 
-			chunk = dat[startIndex:offsetIndex]
-			dat = dat[offsetIndex:]
+			if n < int(chunkSize) {
+				chunk = chunk[:n]
+				last = true
+			}
+
+			chunkQueue <- chunk
 		}
 
-		if err := cb(chunk, i); err != nil {
-			return err
-		}
-	}
+	}()
 
-	return nil
-}
-
-func ChunkTextStream(text string, maxChar int) []string {
-	dataQueue := []string{}
-	stream := text
-
-	var chunk string
-	finished := false
-
-	for !finished {
-		if len(stream) < maxChar {
-			chunk = stream
-			finished = true
-		} else {
-			chunk = stream[:maxChar]
-			stream = stream[maxChar:]
-		}
-
-		dataQueue = append(dataQueue, chunk)
-	}
-
-	return dataQueue
+	return chunkQueue
 }

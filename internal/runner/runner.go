@@ -27,25 +27,14 @@ func (r *runner) Notify() error {
 	if utils.HasStdin() {
 		gologger.Info().Msg("Starting message notifier")
 
-		var dataQueue []string
-		maxChar := int(r.options.CharLimit)
-
 		if r.options.isBulk {
 			dataBytes, err := io.ReadAll(os.Stdin)
 			if err != nil {
 				return err
 			}
 
-			dataQueue = append(dataQueue, string(dataBytes))
-
-			for _, line := range dataQueue {
-				if maxChar != 0 {
-					dataQueue = utils.ChunkTextStream(line, maxChar)
-				}
-
-				for _, data := range dataQueue {
-					r.providers.SendText(&data, &o.Delay)
-				}
+			for chunk := range utils.TextChunkStream(string(dataBytes), r.options.CharLimit) {
+				r.providers.SendText(&chunk, &o.Delay)
 			}
 		} else {
 			sc := bufio.NewScanner(os.Stdin)
@@ -53,14 +42,8 @@ func (r *runner) Notify() error {
 			for sc.Scan() {
 				stream := sc.Text()
 
-				if maxChar != 0 {
-					dataQueue = utils.ChunkTextStream(stream, maxChar)
-				} else {
-					dataQueue = []string{stream}
-				}
-
-				for _, data := range dataQueue {
-					r.providers.SendText(&data, &o.Delay)
+				for chunk := range utils.TextChunkStream(stream, r.options.CharLimit) {
+					r.providers.SendText(&chunk, &o.Delay)
 				}
 
 			}
@@ -81,13 +64,13 @@ func (r *runner) Notify() error {
 
 			r.providers.SendFile(&outFileName, &data, &o.Delay)
 		} else {
-			utils.FileSplit(r.options.File, int(r.options.ChunkSize), func(chunk []byte, iteration int) error {
+			iteration := 1
+			for chunk := range utils.FileChunkStream(r.options.File, r.options.ChunkSize) {
 				outFileName := fmt.Sprintf("%s_pt-%d%s", strings.TrimSuffix(filepath.Base(r.options.File), filepath.Ext(r.options.File)), iteration, filepath.Ext(r.options.File))
 
 				r.providers.SendFile(&outFileName, &chunk, &o.Delay)
-
-				return nil
-			})
+				iteration++
+			}
 		}
 	}
 
