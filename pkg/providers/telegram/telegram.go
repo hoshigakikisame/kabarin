@@ -8,6 +8,7 @@ import (
 
 	"github.com/hoshigakikisame/kabarin/pkg/utils"
 	"github.com/joho/godotenv"
+	"github.com/projectdiscovery/gologger"
 
 	"github.com/gotd/contrib/bg"
 	"github.com/gotd/td/telegram"
@@ -84,13 +85,13 @@ func (t *Telegram) SendFile(fileName *string, data *[]byte) error {
 
 	f, err := t.up.Upload(context.Background(), uploader.NewUpload(*fileName, bytes.NewReader(*data), int64(len(*data))))
 	if err != nil {
-		panic(err)
+		gologger.Fatal().Msg(err.Error())
 	}
 
 	media := message.UploadedDocument(f).ForceFile(true).Filename(*fileName)
 
 	if _, err := t.sender.Resolve(receiverID).Media(context.Background(), media); err != nil {
-		panic(err)
+		gologger.Fatal().Msg(err.Error())
 	}
 
 	return nil
@@ -98,7 +99,7 @@ func (t *Telegram) SendFile(fileName *string, data *[]byte) error {
 
 func (t *Telegram) Close() error {
 	if err := t.stop(); err != nil {
-		panic(err)
+		gologger.Fatal().Msg(err.Error())
 	}
 	return nil
 }

@@ -5,6 +5,7 @@ import (
 	"flag"
 
 	"github.com/hoshigakikisame/kabarin/pkg/utils"
+	"github.com/projectdiscovery/gologger"
 )
 
 type Options struct {
@@ -72,7 +73,7 @@ func Parse() *Options {
 	showBanner()
 
 	if err := o.validate(); err != nil {
-		panic(err)
+		gologger.Fatal().Msg(err.Error())
 	}
 
 	return o

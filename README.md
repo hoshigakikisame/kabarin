@@ -4,6 +4,8 @@ Kabarin is a notification utility that take stdin and a file as an input and sen
 
 ## What Sets Kabarin Apart?
 - **MTProto**: Kabarin uses MTProto to send message to telegram, which is faster, more reliable and support more file size than telegram bot API
+- **File Processing**: Kabarin can send file as an attachment
+- **File Splitter**: Option to split file as specified chunk size
 
 ## TODO
 - [ ] Create unit test
