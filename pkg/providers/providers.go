@@ -51,6 +51,7 @@ func (p *Providers) SendFile(fileName *string, data *[]byte, delay *uint) error 
 		})
 		wait(*delay)
 	}
+	p.throttle.Wait()
 	return nil
 }
 
