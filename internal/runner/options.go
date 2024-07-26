@@ -70,6 +70,11 @@ func (o *Options) validate() error {
 }
 
 func Parse() *Options {
+
+	if o.Version {
+		showVersion()
+	}
+
 	showBanner()
 
 	if err := o.validate(); err != nil {

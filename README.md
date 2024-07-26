@@ -13,8 +13,28 @@ go install -v github.com/hoshigakikisame/kabarin/cmd/kabarin@latest
 ```
 
 ## Usage
-```bash
-kabarin -h
+```text
+$ kabarin -h
+
+   __        __            _
+  / /_____  / /  ___  ____(_)__
+ /  '_/ _ \/ _ \/ _ \/ __/ / _ \
+/_/\_\\_,_/_.__/\_,_/_/ /_/_//_/  v0.0.1
+
+by @ferdirianrk
+
+Usage:
+  kabarin <options>
+  <input> | kabarin <options>
+
+Options:
+  -f,  -file <FILE>               File to be send
+  -cl, -char-limit <CHAR_LIMIT>   Characters limit in single request (default: 0 (unlimited))
+  -cs, -chunk-size <CHUNK_SIZE>   Size of chunks produced by splitting input file (in MB)
+  -b,  -bulk                      Enable bulk processing
+  -rl, -rate-limit <RATE_LIMIT>   Maximum notification to send per second (default: 1)
+  -d,  -delay <DELAY>              Delay in seconds between each notification
+  -v,  -version                   Show kabarin version
 ```
 
 ## Configuration
@@ -29,7 +49,7 @@ Kabarin use environment variable for configuration. You can set it in your shell
 ```bash
 echo hackerone.com | assetfinder --subs-only | kabarin
 ```
-![alt text](https://placehold.co/400x600)
+![alt text](assets/stream_text.png)
 
 ### Bulk text piped input
 ```bash

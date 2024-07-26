@@ -5,9 +5,8 @@ import (
 )
 
 const (
-	version = "1.0.0"
-	author  = "ferdirianrk"
-	banner  = `                           
+	author = "ferdirianrk"
+	banner = `                           
    __        __            _    
   / /_____  / /  ___  ____(_)__ 
  /  '_/ _ \/ _ \/ _ \/ __/ / _ \
