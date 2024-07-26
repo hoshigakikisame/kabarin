@@ -14,7 +14,7 @@ Options:
   -cs, -chunk-size <CHUNK_SIZE>   Size of chunks produced by splitting input file (in MB)
   -b,  -bulk                      Enable bulk processing
   -rl, -rate-limit <RATE_LIMIT>   Maximum notification to send per second (default: 1)
-  -d,  -delay <DELAY>              Delay in seconds between each notification
+  -d,  -delay <DELAY>             Delay in seconds between each notification
   -v,  -version                   Show kabarin version
   `
 )
