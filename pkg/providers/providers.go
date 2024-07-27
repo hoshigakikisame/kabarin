@@ -1,10 +1,9 @@
 package providers
 
 import (
-	"time"
-
 	"github.com/hoshigakikisame/kabarin/pkg/providers/telegram"
 	"github.com/hoshigakikisame/kabarin/pkg/utils/throttle"
+	"github.com/projectdiscovery/gologger"
 )
 
 type Providers struct {
@@ -12,13 +11,13 @@ type Providers struct {
 	throttle     *throttle.Throttle
 }
 
-func New(rateLimit int) (*Providers, error) {
+func New(rateLimit int, delay int) (*Providers, error) {
 	telegramProvider, err := telegram.New()
 	if err != nil {
 		return nil, err
 	}
 
-	throttle, err := throttle.New(time.Duration(rateLimit))
+	throttle, err := throttle.New(rateLimit, delay)
 	if err != nil {
 		return nil, err
 	}
@@ -38,9 +37,9 @@ func (p *Providers) SendText(text *string, delay *uint) error {
 		p.throttle.AddJob(func() {
 			provider.SendText(text)
 		})
-		wait(*delay)
 	}
 	p.throttle.Wait()
+	gologger.Print().Msg(*text)
 	return nil
 }
 
@@ -49,14 +48,8 @@ func (p *Providers) SendFile(fileName *string, data *[]byte, delay *uint) error 
 		p.throttle.AddJob(func() {
 			provider.SendFile(fileName, data)
 		})
-		wait(*delay)
 	}
 	p.throttle.Wait()
+	gologger.Print().Msg(*fileName)
 	return nil
-}
-
-func wait(sec uint) {
-	if sec > 0 {
-		time.Sleep(time.Duration(sec) * time.Second)
-	}
 }

@@ -9,7 +9,7 @@ import (
 func main() {
 	var options *runner.Options = runner.Parse()
 
-	providers, err := providers.New(1)
+	providers, err := providers.New(int(options.RateLimit), int(options.Delay))
 	if err != nil {
 		gologger.Fatal().Msg(err.Error())
 	}
