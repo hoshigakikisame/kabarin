@@ -34,7 +34,9 @@ func (r *runner) Notify() error {
 			}
 
 			for chunk := range utils.TextChunkStream(string(dataBytes), r.options.CharLimit) {
-				r.providers.SendText(&chunk, &o.Delay)
+				if err := r.providers.SendText(&chunk, &o.Delay); err != nil {
+					gologger.Error().Msgf("Error sending message: %s", err)
+				} 
 			}
 		} else {
 			sc := bufio.NewScanner(os.Stdin)
@@ -43,7 +45,9 @@ func (r *runner) Notify() error {
 				stream := sc.Text()
 
 				for chunk := range utils.TextChunkStream(stream, r.options.CharLimit) {
-					r.providers.SendText(&chunk, &o.Delay)
+					if err := r.providers.SendText(&chunk, &o.Delay); err != nil {
+						gologger.Error().Msgf("Error sending message: %s", err)
+					} 
 				}
 
 			}
@@ -62,16 +66,25 @@ func (r *runner) Notify() error {
 			}
 			outFileName = filepath.Base(r.options.File)
 
-			r.providers.SendFile(&outFileName, &data, &o.Delay)
+			
+			if err := r.providers.SendFile(&outFileName, &data, &o.Delay); err != nil {
+				gologger.Error().Msgf("Error sending file: %s", err)
+			}
 		} else {
 			iteration := 1
 			for chunk := range utils.FileChunkStream(r.options.File, r.options.ChunkSize) {
 				outFileName := fmt.Sprintf("%s_pt-%d%s", strings.TrimSuffix(filepath.Base(r.options.File), filepath.Ext(r.options.File)), iteration, filepath.Ext(r.options.File))
-
-				r.providers.SendFile(&outFileName, &chunk, &o.Delay)
+				
+				if err := r.providers.SendFile(&outFileName, &chunk, &o.Delay); err != nil {
+					gologger.Error().Msgf("Error sending file: %s", err)
+				} 
 				iteration++
 			}
 		}
+	}
+	
+	if err := r.providers.Close(); err != nil {
+		gologger.Error().Msgf("Error closing provider: %s", err)
 	}
 
 	return nil

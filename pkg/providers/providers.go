@@ -53,3 +53,12 @@ func (p *Providers) SendFile(fileName *string, data *[]byte, delay *uint) error 
 	gologger.Print().Msg(*fileName)
 	return nil
 }
+
+func (p *Providers) Close() error {
+	for _, provider := range *p.providerList {
+		if err := provider.Close(); err != nil {
+			return err
+		}
+	}
+	return nil
+}

@@ -85,13 +85,13 @@ func (t *Telegram) SendFile(fileName *string, data *[]byte) error {
 
 	f, err := t.up.Upload(context.Background(), uploader.NewUpload(*fileName, bytes.NewReader(*data), int64(len(*data))))
 	if err != nil {
-		gologger.Fatal().Msg(err.Error())
+		return err
 	}
 
 	media := message.UploadedDocument(f).ForceFile(true).Filename(*fileName)
 
 	if _, err := t.sender.Resolve(receiverID).Media(context.Background(), media); err != nil {
-		gologger.Fatal().Msg(err.Error())
+		return err
 	}
 
 	return nil
@@ -99,7 +99,7 @@ func (t *Telegram) SendFile(fileName *string, data *[]byte) error {
 
 func (t *Telegram) Close() error {
 	if err := t.stop(); err != nil {
-		gologger.Fatal().Msg(err.Error())
+		gologger.Error().Msgf("Error stopping telegram client: %s", err)
 	}
 	return nil
 }

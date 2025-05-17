@@ -1,7 +1,8 @@
 module github.com/hoshigakikisame/kabarin
 
-go 1.21.4
-toolchain go1.24.1
+go 1.23.0
+
+toolchain go1.23.7
 
 require (
 	github.com/gotd/contrib v0.20.0
@@ -38,10 +39,10 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
-	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
+	golang.org/x/net v0.36.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
 	gopkg.in/djherbis/times.v1 v1.3.0 // indirect
 	nhooyr.io/websocket v1.8.11 // indirect
 	rsc.io/qr v0.2.0 // indirect
