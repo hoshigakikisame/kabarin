@@ -69,6 +69,9 @@ echo example.com | assetfinder --subs-only > subs.txt; kabarin -file subs.txt -c
 ```
 ![alt text](assets/chunk_file.png)
 
+## TROUBLESHOOT
+- `go install` might just froze and if you get `Out of memory` too from `dmesg` after this affair, try to append `GOMEMLIMIT=1GiB` in front of the install command. This issue is typical in low end VPS and it is evidently caused by `gotd/td` excessive ram consumsion during compilation.
+
 ## TODO
 - [ ] Create unit test
 - [x] Add file splitter if input file size is too big
