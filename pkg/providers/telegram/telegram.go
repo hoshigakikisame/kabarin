@@ -26,7 +26,10 @@ type Telegram struct {
 
 func New() (*Telegram, error) {
 	godotenv.Load()
-	utils.ValidateEnvVars("TELEGRAM_API_ID", "TELEGRAM_API_HASH", "TELEGRAM_BOT_TOKEN", "TELEGRAM_RECEIVER_ID")
+	
+	if err := utils.ValidateEnvVars("TELEGRAM_API_ID", "TELEGRAM_API_HASH", "TELEGRAM_BOT_TOKEN", "TELEGRAM_RECEIVER_ID"); err != nil {
+		return nil, err
+	}
 
 	var (
 		apiID, _ = strconv.Atoi(os.Getenv("TELEGRAM_API_ID"))
