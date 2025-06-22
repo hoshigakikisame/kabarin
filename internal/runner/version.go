@@ -6,7 +6,7 @@ import (
 	"github.com/projectdiscovery/gologger"
 )
 
-const version = "0.0.1"
+const version = "0.0.4"
 
 func showVersion() {
 	gologger.Print().Msgf("kabarin v%s", version)
