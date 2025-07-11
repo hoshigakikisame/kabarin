@@ -10,6 +10,7 @@ Usage:
 	options = `
 Options:
   -f,  -file <FILE>               File to be send
+  -p,  -provider <PROVIDER>       Target provider to be send (default: telegram (telegram, discord, all))
   -cl, -char-limit <CHAR_LIMIT>   Characters limit in single request (default: 0 (unlimited))
   -cs, -chunk-size <CHUNK_SIZE>   Size of chunks produced by splitting input file (in MB)
   -b,  -bulk                      Enable bulk processing

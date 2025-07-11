@@ -10,6 +10,7 @@ import (
 
 type Options struct {
 	File      string
+	Provider  string
 	ChunkSize uint
 	Version   bool
 	CharLimit uint
@@ -25,6 +26,9 @@ func init() {
 
 	flag.StringVar(&o.File, "f", "", "")
 	flag.StringVar(&o.File, "file", "", "")
+
+	flag.StringVar(&o.Provider, "p", "", "")
+	flag.StringVar(&o.Provider, "Provider", "", "")
 
 	flag.UintVar(&o.ChunkSize, "cs", 0, "")
 	flag.UintVar(&o.ChunkSize, "chunk-size", 0, "")

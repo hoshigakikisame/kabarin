@@ -40,6 +40,11 @@ func ValidateEnvVars(keys ...string) error {
 			errStr += fmt.Sprintf("ENV Var: %s is required\n", key)
 		}
 	}
+
+	if errStr == "" {
+		return nil
+	}
+
 	return errors.New(errStr)
 }
 
